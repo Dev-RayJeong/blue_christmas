@@ -13,7 +13,6 @@ class DBHelper {
   static Database _database;
   Future<Database> get database async {
     if (_database != null) return _database;
-
     _database = await initDB();
     return _database;
   }
@@ -40,7 +39,7 @@ class DBHelper {
     final db = await database;
     var res =
         await db.query(tableName, where: 'bookId = ?', whereArgs: [bookId]);
-    return res.isNotEmpty ? Read.fromJson(res.first) : Null;
+    return res.isNotEmpty ? Read.fromJson(res.first) : null;
   }
 
   // READ ALL DATA

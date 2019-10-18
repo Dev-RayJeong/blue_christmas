@@ -43,7 +43,13 @@ class PreferencesHelper {
     return p.setDouble(key, value);
   }
 
+  static Future clear() async {
+    final p = await prefs;
+    return p.clear();
+  }
+
   // helper
 
-  static Future<dynamic> get prefs async => await Preferences.preferences(path: 'pathToPrefs');
+  static Future<dynamic> get prefs async =>
+      await Preferences.preferences(path: 'pathToPrefs');
 }

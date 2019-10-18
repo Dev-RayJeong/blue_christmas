@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'post.dart';
 import 'DBHelper.dart';
 import 'models/read.dart';
+import 'PreferenceHelper.dart';
 
 class CustomListItem extends StatelessWidget {
   final num index;
@@ -21,13 +23,14 @@ class CustomListItem extends StatelessWidget {
         //   padding: const EdgeInsets.symmetric(vertical: 4.0),
         //   child:
         FutureBuilder<dynamic>(
-            future: DBHelper().getRead(index), //
+            future: kIsWeb
+                ? PreferencesHelper.getString(index.toString())
+                : DBHelper().getRead(index), //
             builder: (context, snapshot) {
               dynamic read = snapshot.data;
-              print(read);
-
-              Color readIconColor =
-                  read == Null ? Colors.grey[300] : Colors.yellow[800];
+              Color readIconColor = read == true || read == 'true'
+                  ? Colors.yellow[800]
+                  : Colors.grey[300];
 
               return Container(
                   height: 48,
@@ -116,11 +119,15 @@ class _PostListState extends State<PostList> {
                     postList: postList,
                   ),
                   onTap: () {
-                    Read read = Read(
-                      bookId: index,
-                      complete: true,
-                    );
-                    DBHelper().createData(read);
+                    if (kIsWeb) {
+                      PreferencesHelper.setString(index.toString(), 'true');
+                    } else {
+                      Read read = Read(
+                        bookId: index,
+                        complete: true,
+                      );
+                      DBHelper().createData(read);
+                    }
                     Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -136,12 +143,15 @@ class _PostListState extends State<PostList> {
                         postList: postList,
                       ),
                       onTap: () {
-                        Read read = Read(
-                          bookId: index,
-                          complete: true,
-                        );
-                        DBHelper().createData(read);
-
+                        if (kIsWeb) {
+                          PreferencesHelper.setString(index.toString(), 'true');
+                        } else {
+                          Read read = Read(
+                            bookId: index,
+                            complete: true,
+                          );
+                          DBHelper().createData(read);
+                        }
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -166,7 +176,11 @@ class _PostListState extends State<PostList> {
                   color: Colors.white,
                 ),
                 onPressed: () {
-                  DBHelper().deleteAllReads();
+                  if (kIsWeb) {
+                    PreferencesHelper.clear();
+                  } else {
+                    DBHelper().deleteAllReads();
+                  }
                   Navigator.pushReplacement(context,
                       MaterialPageRoute(builder: (context) => PostList()));
                 })
